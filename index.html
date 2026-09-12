@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satata X-Ray & Diagnostic Center - Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #0891b2;
+    --primary-dark: #0e7490;
+    --primary-light: #22d3ee;
+    --secondary: #6366f1;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --dark: #0f172a;
+    --gray: #64748b;
+    --light: #f1f5f9;
+    --white: #ffffff;
+    --border: #e2e8f0;
+    --shadow: 0 10px 30px rgba(0,0,0,0.08);
+    --shadow-lg: 0 20px 50px rgba(8,145,178,0.15);
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: var(--dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== LOGIN PAGE ===== */
+  .login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0891b2 0%, #6366f1 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-wrapper::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    top: -200px; right: -200px;
+    animation: float 8s ease-in-out infinite;
+  }
+  .login-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    bottom: -100px; left: -100px;
+    animation: float 10s ease-in-out infinite reverse;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-30px) rotate(10deg); }
+  }
+  .login-card {
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(20px);
+    padding: 50px 45px;
+    border-radius: 24px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 2;
+    animation: slideUp 0.6s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .login-logo {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 30px rgba(8,145,178,0.4);
+  }
+  .login-logo i { color: white; font-size: 38px; }
+  .login-title {
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+  .login-subtitle {
+    text-align: center;
+    color: var(--gray);
+    font-size: 14px;
+    margin-bottom: 30px;
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    font-size: 16px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 14px 16px 14px 46px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s;
+    background: #f8fafc;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(8,145,178,0.1);
+  }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    font-family: inherit;
+  }
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(8,145,178,0.4);
+  }
+  .google-btn {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    color: var(--dark);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 15px;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .google-btn:hover {
+    border-color: var(--primary);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  .google-btn img {
+    width: 20px;
+    height: 20px;
+  }
+  .divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+    color: var(--gray);
+    font-size: 13px;
+  }
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider span {
+    background: white;
+    padding: 0 15px;
+    position: relative;
+  }
+  .login-error {
+    background: #fee2e2;
+    color: var(--danger);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 15px;
+    display: none;
+    text-align: center;
+  }
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+  }
+  .loading.active { display: block; }
+  .spinner {
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* ===== MAIN APP ===== */
+  .app-wrapper { display: none; min-height: 100vh; }
+  .app-wrapper.active { display: flex; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 270px;
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 25px 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: all 0.3s;
+    z-index: 100;
+  }
+  .sidebar-header {
+    padding: 0 25px 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sidebar-logo {
+    width: 45px; height: 45px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .sidebar-logo i { color: white; font-size: 22px; }
+  .sidebar-brand h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .sidebar-brand p {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+  .nav-menu {
+    padding: 20px 15px;
+    list-style: none;
+  }
+  .nav-item { margin-bottom: 4px; }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: #cbd5e1;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .nav-link:hover {
+    background: rgba(255,255,255,0.05);
+    color: white;
+  }
+  .nav-link.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: 0 8px 20px rgba(8,145,178,0.3);
+  }
+  .nav-link i { font-size: 17px; width: 22px; text-align: center; }
+  .logout-btn {
+    margin: 20px 15px;
+    padding: 12px;
+    background: rgba(239,68,68,0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+    font-family: inherit;
+  }
+  .logout-btn:hover { background: rgba(239,68,68,0.2); color: white; }
+
+  /* Main Content */
+  .main-content {
+    margin-left: 270px;
+    flex: 1;
+    padding: 25px 30px;
+    width: calc(100% - 270px);
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    background: white;
+    padding: 18px 25px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+  .page-title h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--dark);
+  }
+  .page-title p {
+    font-size: 13px;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .user-avatar {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    overflow: hidden;
+  }
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .user-details h4 { font-size: 14px; font-weight: 600; }
+  .user-details p { font-size: 12px; color: var(--gray); }
+
+  /* Page Sections */
+  .page-section { display: none; animation: fadeIn 0.4s ease; }
+  .page-section.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== COMPACT STAT CARDS (CLICKABLE) ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .stat-card {
+    background: white;
+    padding: 14px 16px;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 2px solid transparent;
+    user-select: none;
+  }
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+  }
+  .stat-card:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+  .stat-card::after {
+    content: '\f061';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 11px;
+    color: #cbd5e1;
+    transition: all 0.3s;
+  }
+  .stat-card:hover::after {
+    color: var(--primary);
+    transform: translateX(3px);
+  }
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+  .stat-card.blue .stat-icon { background: linear-gradient(135deg, #0891b2, #22d3ee); }
+  .stat-card.green .stat-icon { background: linear-gradient(135deg, #10b981, #34d399); }
+  .stat-card.orange .stat-icon { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+  .stat-card.red .stat-icon { background: linear-gradient(135deg, #ef4444, #f87171); }
+  .stat-card.purple .stat-icon { background: linear-gradient(135deg, #6366f1, #818cf8); }
+  .stat-info { flex: 1; min-width: 0; padding-right: 16px; }
+  .stat-label {
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 500;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .stat-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.1;
+  }
+  .stat-card.blue { border-left: 3px solid #0891b2; }
+  .stat-card.green { border-left: 3px solid #10b981; }
+  .stat-card.orange { border-left: 3px solid #f59e0b; }
+  .stat-card.red { border-left: 3px solid #ef4444; }
+  .stat-card.purple { border-left: 3px solid #6366f1; }
+
+  /* Cards / Panels */
+  .card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 25px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .card-header h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header h3 i { color: var(--primary); }
+  .card-body { padding: 25px; }
+
+  /* Form Grid */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+  .form-grid .full-width { grid-column: 1 / -1; }
+  .form-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #f8fafc;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .form-select:focus, .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(8,145,178,0.1);
+  }
+  .form-input-plain {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #f8fafc;
+    transition: all 0.3s;
+  }
+  .form-input-plain:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(8,145,178,0.1);
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 11px 22px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(8,145,178,0.35);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white;
+  }
+  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16,185,129,0.35); }
+  .btn-danger {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    color: white;
+  }
+  .btn-danger:hover { transform: translateY(-2px); }
+  .btn-warning {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+    color: white;
+  }
+  .btn-secondary {
+    background: #f1f5f9;
+    color: var(--dark);
+  }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .btn-sm { padding: 7px 12px; font-size: 12px; }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  }
+  th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: #334155;
+  }
+  tbody tr { transition: all 0.2s; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* Status Badges */
+  .badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .badge-paid { background: #d1fae5; color: #065f46; }
+  .badge-due { background: #fee2e2; color: #991b1b; }
+  .badge-active { background: #dbeafe; color: #1e40af; }
+
+  /* Search Bar */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .search-bar input, .search-bar select {
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    min-width: 180px;
+  }
+  .search-bar input:focus, .search-bar select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+  .modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s;
+  }
+  .modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .modal-close {
+    background: #f1f5f9;
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--gray);
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: #e2e8f0; color: var(--dark); }
+  .modal-body { padding: 25px; }
+  .modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    padding: 14px 22px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateX(400px);
+    transition: transform 0.4s;
+  }
+  .toast.show { transform: translateX(0); }
+  .toast.success { background: linear-gradient(135deg, var(--success), #059669); }
+  .toast.error { background: linear-gradient(135deg, var(--danger), #dc2626); }
+  .toast.info { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--gray);
+  }
+  .empty-state i {
+    font-size: 50px;
+    color: #cbd5e1;
+    margin-bottom: 15px;
+  }
+  .empty-state h4 {
+    font-size: 16px;
+    color: var(--dark);
+    margin-bottom: 5px;
+  }
+  .empty-state p { font-size: 13px; }
+
+  /* Action Buttons */
+  .action-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 4px;
+    transition: all 0.2s;
+  }
+  .action-btn.edit { background: #dbeafe; color: #1e40af; }
+  .action-btn.delete { background: #fee2e2; color: #991b1b; }
+  .action-btn.pay { background: #d1fae5; color: #065f46; }
+  .action-btn:hover { transform: scale(1.05); }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; width: 100%; padding: 20px; }
+    .menu-toggle { display: flex !important; }
+  }
+  .menu-toggle {
+    display: none;
+    width: 40px; height: 40px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN PAGE ============ -->
+<div class="login-wrapper" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <i class="fas fa-x-ray"></i>
+    </div>
+    <h2 class="login-title">Satata X-Ray Center</h2>
+    <p class="login-subtitle">Diagnostic Center · Chuadanga</p>
+    <div class="login-error" id="loginError">
+      <i class="fas fa-exclamation-circle"></i> <span id="loginErrorMsg">Login failed</span>
+    </div>
+    <div class="loading" id="loginLoading">
+      <div class="spinner"></div>
+      <p>Logging in...</p>
+    </div>
+    <div id="loginFormWrapper">
+      <button class="google-btn" onclick="signInWithGoogle()">
+        <img src="https://www.google.com/favicon.ico" alt="Google">
+        Sign in with Google
+      </button>
+      <div class="divider"><span>or</span></div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" class="form-input" id="loginPass" placeholder="Enter password" required>
+          </div>
+        </div>
+        <button type="submit" class="login-btn">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div class="app-wrapper" id="appPage">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i class="fas fa-x-ray"></i></div>
+      <div class="sidebar-brand">
+        <h3>Satata X-Ray</h3>
+        <p>Diagnostic Center</p>
+      </div>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item"><a class="nav-link active" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="new-entry"><i class="fas fa-plus-circle"></i> New X-Ray Entry</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="patients"><i class="fas fa-users"></i> Patient Register</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="due"><i class="fas fa-exclamation-triangle"></i> Due Management</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="referrers"><i class="fas fa-handshake"></i> Referrer Management</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="investigations"><i class="fas fa-stethoscope"></i> X-Ray Investigations</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="film-stock"><i class="fas fa-film"></i> Film Stock</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="reports"><i class="fas fa-chart-line"></i> Reports & Accounts</a></li>
+    </ul>
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:15px;">
+        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="page-title">
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSubtitle">Overview of your diagnostic center</p>
+        </div>
+      </div>
+      <div class="user-info">
+        <div class="user-details" style="text-align:right;">
+          <h4 id="userName">User</h4>
+          <p id="currentDate"></p>
+        </div>
+        <div class="user-avatar" id="userAvatar">U</div>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="page-section active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue" onclick="navigateTo('patients')">
+          <div class="stat-icon"><i class="fas fa-users"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Total Patients</div>
+            <div class="stat-value" id="statTotal">0</div>
+          </div>
+        </div>
+        <div class="stat-card green" onclick="navigateTo('patients', 'PAID')">
+          <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Paid Patients</div>
+            <div class="stat-value" id="statPaid">0</div>
+          </div>
+        </div>
+        <div class="stat-card red" onclick="navigateTo('due')">
+          <div class="stat-icon"><i class="fas fa-clock"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Due Patients</div>
+            <div class="stat-value" id="statDue">0</div>
+          </div>
+        </div>
+        <div class="stat-card purple" onclick="navigateTo('reports', null, 'paid')">
+          <div class="stat-icon"><i class="fas fa-bangladeshi-taka-sign"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Paid Collection</div>
+            <div class="stat-value">৳<span id="statCollection">0</span></div>
+          </div>
+        </div>
+        <div class="stat-card orange" onclick="navigateTo('due')">
+          <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Outstanding Due</div>
+            <div class="stat-value">৳<span id="statOutstanding">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-history"></i> Recent Patients</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Patient</th><th>Investigation</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+              </thead>
+              <tbody id="recentPatients"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== NEW ENTRY ===== -->
+    <section class="page-section" id="page-new-entry">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-user-plus"></i> New X-Ray Entry</h3>
+        </div>
+        <div class="card-body">
+          <form id="patientForm">
+            <div class="form-grid">
+              <div>
+                <label class="form-label">Patient Name *</label>
+                <input type="text" class="form-input-plain" id="pName" required>
+              </div>
+              <div>
+                <label class="form-label">Mobile (Optional)</label>
+                <input type="text" class="form-input-plain" id="pMobile" placeholder="01XXXXXXXXX">
+              </div>
+              <div class="full-width">
+                <label class="form-label">X-Ray Investigation *</label>
+                <select class="form-select" id="pInvestigation" required></select>
+              </div>
+              <div>
+                <label class="form-label">Film Size</label>
+                <select class="form-select" id="pFilm">
+                  <option value="8×10">8×10</option>
+                  <option value="10×14">10×14</option>
+                  <option value="14×17">14×17</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Referred By</label>
+                <select class="form-select" id="pReferrer">
+                  <option value="">No Referred By (Main Price)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Payment Amount (৳)</label>
+                <input type="number" class="form-input-plain" id="pAmount" step="0.01" required>
+              </div>
+              <div>
+                <label class="form-label">Payment Status</label>
+                <select class="form-select" id="pStatus">
+                  <option value="PAID">PAID</option>
+                  <option value="DUE">DUE</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:25px; display:flex; gap:10px;">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Patient Entry</button>
+              <button type="reset" class="btn btn-secondary"><i class="fas fa-undo"></i> Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PATIENTS ===== -->
+    <section class="page-section" id="page-patients">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-users"></i> Patient Register</h3>
+          <div class="search-bar">
+            <input type="text" id="patientSearch" placeholder="Search patient...">
+            <select id="patientFilter">
+              <option value="All">All Status</option>
+              <option value="PAID">PAID</option>
+              <option value="DUE">DUE</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Patient</th><th>Investigation</th><th>Film</th><th>Amount</th><th>Status</th><th>Referrer</th><th>Action</th></tr>
+              </thead>
+              <tbody id="patientsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DUE MANAGEMENT ===== -->
+    <section class="page-section" id="page-due">
+      <div class="stats-grid">
+        <div class="stat-card red" onclick="navigateTo('due')">
+          <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Outstanding Due</div>
+            <div class="stat-value">৳<span id="dueOutstanding">0</span></div>
+          </div>
+        </div>
+        <div class="stat-card orange" onclick="navigateTo('due')">
+          <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Due Patients</div>
+            <div class="stat-value" id="duePatients">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-money-bill-wave"></i> Due Management</h3>
+          <div class="search-bar">
+            <input type="text" id="dueSearch" placeholder="Search patient / referrer...">
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Patient</th><th>Referrer</th><th>Amount</th><th>Paid</th><th>Due</th><th>Action</th></tr>
+              </thead>
+              <tbody id="dueTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== REFERRERS ===== -->
+    <section class="page-section" id="page-referrers">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-user-plus"></i> Add New Referrer</h3>
+        </div>
+        <div class="card-body">
+          <form id="referrerForm">
+            <div class="form-grid">
+              <div>
+                <label class="form-label">Name *</label>
+                <input type="text" class="form-input-plain" id="rName" required>
+              </div>
+              <div>
+                <label class="form-label">Mobile</label>
+                <input type="text" class="form-input-plain" id="rMobile">
+              </div>
+              <div>
+                <label class="form-label">WhatsApp</label>
+                <input type="text" class="form-input-plain" id="rWhatsapp">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:18px;"><i class="fas fa-plus"></i> Add Referrer</button>
+          </form>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-handshake"></i> Referrer List</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Mobile</th><th>WhatsApp</th><th>Total Patients</th><th>Paid</th><th>Due</th><th>Due Amount</th><th>Action</th></tr>
+              </thead>
+              <tbody id="referrersTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INVESTIGATIONS ===== -->
+    <section class="page-section" id="page-investigations">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-stethoscope"></i> Add X-Ray Investigation</h3>
+        </div>
+        <div class="card-body">
+          <form id="investigationForm">
+            <div class="form-grid">
+              <div>
+                <label class="form-label">Investigation Name *</label>
+                <input type="text" class="form-input-plain" id="iName" required>
+              </div>
+              <div>
+                <label class="form-label">Main Price (৳) *</label>
+                <input type="number" class="form-input-plain" id="iMainPrice" step="0.01" required>
+              </div>
+              <div>
+                <label class="form-label">Referral Price (৳)</label>
+                <input type="number" class="form-input-plain" id="iRefPrice" step="0.01">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:18px;"><i class="fas fa-plus"></i> Add Investigation</button>
+          </form>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-list"></i> Investigation List</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Investigation</th><th>Main Price</th><th>Referral Price</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody id="investigationsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FILM STOCK ===== -->
+    <section class="page-section" id="page-film-stock">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-plus-circle"></i> Add Film Stock</h3>
+        </div>
+        <div class="card-body">
+          <form id="filmForm">
+            <div class="form-grid">
+              <div>
+                <label class="form-label">Film Size</label>
+                <select class="form-select" id="fSize">
+                  <option value="8×10">8×10</option>
+                  <option value="10×14">10×14</option>
+                  <option value="14×17">14×17</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Quantity</label>
+                <input type="number" class="form-input-plain" id="fQty" min="1" required>
+              </div>
+              <div>
+                <label class="form-label">Note</label>
+                <input type="text" class="form-input-plain" id="fNote" placeholder="Optional note">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:18px;"><i class="fas fa-plus"></i> Add Stock</button>
+          </form>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-film"></i> Film Stock Overview</h3>
+        </div>
+        <div class="card-body">
+          <div class="stats-grid" id="filmStockCards"></div>
+          <div class="table-wrap" style="margin-top:20px;">
+            <table>
+              <thead>
+                <tr><th>Date</th><th>Film Size</th><th>Quantity</th><th>Note</th></tr>
+              </thead>
+              <tbody id="filmTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== REPORTS ===== -->
+    <section class="page-section" id="page-reports">
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-chart-line"></i> Generate Report</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div>
+              <label class="form-label">From Date</label>
+              <input type="date" class="form-input-plain" id="rptFrom">
+            </div>
+            <div>
+              <label class="form-label">To Date</label>
+              <input type="date" class="form-input-plain" id="rptTo">
+            </div>
+            <div>
+              <label class="form-label">Report Type</label>
+              <select class="form-select" id="rptType">
+                <option value="all">All Patients</option>
+                <option value="referrer">Referrer-wise</option>
+                <option value="monthly">Monthly Account</option>
+                <option value="due">Due Report</option>
+                <option value="paid">Paid Report</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Referrer (Optional)</label>
+              <select class="form-select" id="rptReferrer">
+                <option value="">All Referrers</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="generateReport()"><i class="fas fa-file-alt"></i> Generate Report</button>
+            <button class="btn btn-danger" onclick="printReport()"><i class="fas fa-file-pdf"></i> Print / PDF</button>
+            <button class="btn btn-success" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="reportResult" style="display:none;">
+        <div class="card-header">
+          <h3><i class="fas fa-file-invoice"></i> Report Result</h3>
+        </div>
+        <div class="card-body" id="reportContent"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ============ SUPABASE INITIALIZATION ============
+const SUPABASE_URL = '%VITE_SUPABASE_URL%';
+const SUPABASE_ANON_KEY = '%VITE_SUPABASE_ANON_KEY%';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============ AUTH STATE ============
+let currentUser = null;
+
+// Check auth state on load
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session) {
+    currentUser = session.user;
+    showApp();
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    showLogin();
+  }
+});
+
+// Initial check
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    showApp();
+  } else {
+    showLogin();
+  }
+}
+
+checkAuth();
+
+// ============ GOOGLE SIGN IN ============
+window.signInWithGoogle = async function() {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) throw error;
+  } catch (error) {
+    showLoginError(error.message);
+  }
+};
+
+// ============ EMAIL/PASSWORD LOGIN ============
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPass').value;
+  
+  document.getElementById('loginFormWrapper').style.display = 'none';
+  document.getElementById('loginLoading').classList.add('active');
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    
+    if (error) throw error;
+    currentUser = data.user;
+    showApp();
+  } catch (error) {
+    document.getElementById('loginFormWrapper').style.display = 'block';
+    document.getElementById('loginLoading').classList.remove('active');
+    showLoginError(error.message);
+  }
+});
+
+// ============ LOGOUT ============
+window.logout = async function() {
+  if (confirm('Are you sure you want to logout?')) {
+    await supabase.auth.signOut();
+    location.reload();
+  }
+};
+
+// ============ UI FUNCTIONS ============
+function showLogin() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('appPage').classList.remove('active');
+}
+
+function showApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appPage').classList.add('active');
+  
+  // Update user info
+  if (currentUser) {
+    document.getElementById('userName').textContent = currentUser.user_metadata?.name || currentUser.email;
+    const avatar = document.getElementById('userAvatar');
+    if (currentUser.user_metadata?.avatar_url) {
+      avatar.innerHTML = `<img src="${currentUser.user_metadata.avatar_url}" alt="Avatar">`;
+    } else {
+      avatar.textContent = (currentUser.email || 'U')[0].toUpperCase();
+    }
+  }
+  
+  updateDate();
+  refreshAll();
+}
+
+function showLoginError(msg) {
+  document.getElementById('loginErrorMsg').textContent = msg;
+  document.getElementById('loginError').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('loginError').style.display = 'none';
+  }, 5000);
+}
+
+function updateDate() {
+  const d = new Date();
+  const opts = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+  document.getElementById('currentDate').textContent = d.toLocaleDateString('en-US', opts);
+}
+
+// ============ NAVIGATION ============
+window.navigateTo = function(page, filter=null, reportType=null) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const link = document.querySelector(`.nav-link[data-page="${page}"]`);
+  if (link) link.classList.add('active');
+
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+
+  const titles = {
+    'dashboard': ['Dashboard', 'Overview of your diagnostic center'],
+    'new-entry': ['New X-Ray Entry', 'Register a new patient'],
+    'patients': ['Patient Register', 'View and manage all patients'],
+    'due': ['Due Management', 'Track outstanding payments'],
+    'referrers': ['Referrer Management', 'Manage referring doctors'],
+    'investigations': ['X-Ray Investigations', 'Manage tests and pricing'],
+    'film-stock': ['Film Stock', 'Track X-ray film inventory'],
+    'reports': ['Reports & Accounts', 'Generate and share reports']
+  };
+  document.getElementById('pageTitle').textContent = titles[page][0];
+  document.getElementById('pageSubtitle').textContent = titles[page][1];
+
+  if (page === 'patients' && filter) {
+    document.getElementById('patientFilter').value = filter;
+    renderPatients();
+  }
+
+  if (page === 'reports' && reportType) {
+    document.getElementById('rptType').value = reportType;
+    setTimeout(() => generateReport(), 100);
+  }
+
+  if (window.innerWidth <= 992) document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    navigateTo(link.dataset.page);
+  });
+});
+
+window.toggleSidebar = function() {
+  document.getElementById('sidebar').classList.toggle('open');
+};
+
+// ============ TOAST ============
+window.toast = function(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':type==='error'?'times-circle':'info-circle'}"></i> ${msg}`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+};
+
+// ============ MODAL ============
+window.openModal = function(title, body, footer='') {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalFooter').innerHTML = footer;
+  document.getElementById('modal').classList.add('active');
+};
+window.closeModal = function() {
+  document.getElementById('modal').classList.remove('active');
+};
+
+// ============ INVESTIGATIONS ============
+document.getElementById('investigationForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    const { data, error } = await supabase
+      .from('investigations')
+      .insert([{
+        name: document.getElementById('iName').value.trim(),
+        main_price: parseFloat(document.getElementById('iMainPrice').value),
+        ref_price: parseFloat(document.getElementById('iRefPrice').value) || 0,
+        active: true
+      }])
+      .select();
+    
+    if (error) throw error;
+    e.target.reset();
+    toast('Investigation added');
+    refreshAll();
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+});
+
+async function renderInvestigations() {
+  try {
+    const { data, error } = await supabase
+      .from('investigations')
+      .select('*')
+      .order('id', { ascending: true });
+    
+    if (error) throw error;
+    
+    const list = data || [];
+    const tbody = document.getElementById('investigationsTable');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-stethoscope"></i><h4>No investigations</h4><p>Add your first X-ray investigation</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(i => `
+      <tr>
+        <td><strong>${i.name}</strong></td>
+        <td>৳${i.main_price}</td>
+        <td>৳${i.ref_price || 0}</td>
+        <td><span class="badge ${i.active?'badge-active':'badge-due'}">${i.active?'Active':'Inactive'}</span></td>
+        <td>
+          <button class="action-btn edit" onclick="toggleInvestigation(${i.id})"><i class="fas fa-${i.active?'pause':'play'}"></i></button>
+          <button class="action-btn delete" onclick="deleteInvestigation(${i.id})"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+
+    const select = document.getElementById('pInvestigation');
+    const active = list.filter(i => i.active);
+    select.innerHTML = '<option value="">Select an X-Ray investigation</option>' +
+      active.map(i => `<option value="${i.id}" data-main="${i.main_price}" data-ref="${i.ref_price}">${i.name} — Main: ৳${i.main_price} / Ref: ৳${i.ref_price}</option>`).join('');
+  } catch (error) {
+    toast('Error loading investigations: ' + error.message, 'error');
+  }
+}
+
+window.toggleInvestigation = async function(id) {
+  try {
+    const { data: inv } = await supabase.from('investigations').select('active').eq('id', id).single();
+    const { error } = await supabase
+      .from('investigations')
+      .update({ active: !inv.active })
+      .eq('id', id);
+    
+    if (error) throw error;
+    refreshAll();
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+};
+
+window.deleteInvestigation = async function(id) {
+  if (!confirm('Delete this investigation?')) return;
+  try {
+    const { error } = await supabase.from('investigations').delete().eq('id', id);
+    if (error) throw error;
+    refreshAll();
+    toast('Investigation deleted');
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+};
+
+// ============ REFERRERS ============
+document.getElementById('referrerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    const { data, error } = await supabase
+      .from('referrers')
+      .insert([{
+        name: document.getElementById('rName').value.trim(),
+        mobile: document.getElementById('rMobile').value.trim(),
+        whatsapp: document.getElementById('rWhatsapp').value.trim()
+      }])
+      .select();
+    
+    if (error) throw error;
+    e.target.reset();
+    toast('Referrer added');
+    refreshAll();
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+});
+
+async function renderReferrers() {
+  try {
+    const { data: referrers, error } = await supabase
+      .from('referrers')
+      .select('*')
+      .order('id', { ascending: true });
+    
+    if (error) throw error;
+    
+    const { data: patients } = await supabase.from('patients').select('*');
+    const list = referrers || [];
+    const tbody = document.getElementById('referrersTable');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-handshake"></i><h4>No referrers</h4><p>Add your first referrer</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = list.map(r => {
+        const pts = (patients || []).filter(p => p.referrer_id === r.id);
+        const paid = pts.filter(p => p.status === 'PAID').length;
+        const due = pts.filter(p => p.status === 'DUE').length;
+        const dueAmt = pts.filter(p => p.status === 'DUE').reduce((s,p) => s + (p.amount - (p.paid||0)), 0);
+        return `
+          <tr>
+            <td><strong>${r.name}</strong></td>
+            <td>${r.mobile || '-'}</td>
+            <td>${r.whatsapp || '-'}</td>
+            <td>${pts.length}</td>
+            <td>${paid}</td>
+            <td>${due}</td>
+            <td>৳${dueAmt}</td>
+            <td>
+              <button class="action-btn delete" onclick="deleteReferrer(${r.id})"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    const options = '<option value="">No Referred By (Main Price)</option>' +
+      list.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+    document.getElementById('pReferrer').innerHTML = options;
+    document.getElementById('rptReferrer').innerHTML = '<option value="">All Referrers</option>' +
+      list.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  } catch (error) {
+    toast('Error loading referrers: ' + error.message, 'error');
+  }
+}
+
+window.deleteReferrer = async function(id) {
+  if (!confirm('Delete this referrer?')) return;
+  try {
+    const { error } = await supabase.from('referrers').delete().eq('id', id);
+    if (error) throw error;
+    refreshAll();
+    toast('Referrer deleted');
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+};
+
+// ============ PATIENTS ============
+document.getElementById('pInvestigation').addEventListener('change', (e) => {
+  const opt = e.target.options[e.target.selectedIndex];
+  const refId = document.getElementById('pReferrer').value;
+  if (refId && opt.dataset.ref) {
+    document.getElementById('pAmount').value = opt.dataset.ref;
+  } else if (opt.dataset.main) {
+    document.getElementById('pAmount').value = opt.dataset.main;
+  }
+});
+
+document.getElementById('pReferrer').addEventListener('change', (e) => {
+  const inv = document.getElementById('pInvestigation');
+  const opt = inv.options[inv.selectedIndex];
+  if (e.target.value && opt.dataset.ref) {
+    document.getElementById('pAmount').value = opt.dataset.ref;
+  } else if (opt.dataset.main) {
+    document.getElementById('pAmount').value = opt.dataset.main;
+  }
+});
+
+document.getElementById('patientForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    const refId = document.getElementById('pReferrer').value;
+    const invId = document.getElementById('pInvestigation').value;
+    
+    const { data: invData } = await supabase.from('investigations').select('name').eq('id', invId).single();
+    const { data: refData } = refId ? await supabase.from('referrers').select('name').eq('id', refId).single() : { data: null };
+    
+    const amount = parseFloat(document.getElementById('pAmount').value);
+    const status = document.getElementById('pStatus').value;
+    
+    const { data, error } = await supabase
+      .from('patients')
+      .insert([{
+        name: document.getElementById('pName').value.trim(),
+        mobile: document.getElementById('pMobile').value.trim(),
+        investigation_id: parseInt(invId),
+        investigation_name: invData?.name || '',
+        film_size: document.getElementById('pFilm').value,
+        referrer_id: refId ? parseInt(refId) : null,
+        referrer_name: refData?.name || '',
+        amount: amount,
+        paid: status === 'PAID' ? amount : 0,
+        status: status
+      }])
+      .select();
+    
+    if (error) throw error;
+    e.target.reset();
+    toast('Patient entry saved successfully');
+    refreshAll();
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+});
+
+async function renderPatients() {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('*')
+      .order('id', { ascending: false });
+    
+    if (error) throw error;
+    
+    const list = data || [];
+    const search = document.getElementById('patientSearch').value.toLowerCase();
+    const filter = document.getElementById('patientFilter').value;
+    let filtered = list.filter(p => {
+      const matchSearch = p.name.toLowerCase().includes(search) || (p.referrer_name||'').toLowerCase().includes(search);
+      const matchFilter = filter === 'All' || p.status === filter;
+      return matchSearch && matchFilter;
+    });
+    
+    const tbody = document.getElementById('patientsTable');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-users"></i><h4>No patients found</h4><p>Register a new patient to get started</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = filtered.map((p, idx) => `
+        <tr>
+          <td>#${String(idx + 1).padStart(3,'0')}</td>
+          <td><strong>${p.name}</strong><br><small style="color:var(--gray);">${p.mobile||'-'}</small></td>
+          <td>${p.investigation_name}</td>
+          <td>${p.film_size}</td>
+          <td>৳${p.amount}</td>
+          <td><span class="badge badge-${p.status.toLowerCase()}">${p.status}</span></td>
+          <td>${p.referrer_name || '-'}</td>
+          <td>
+            ${p.status==='DUE' ? `<button class="action-btn pay" onclick="payDue(${p.id})"><i class="fas fa-money-bill"></i></button>` : ''}
+            <button class="action-btn delete" onclick="deletePatient(${p.id})"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  } catch (error) {
+    toast('Error loading patients: ' + error.message, 'error');
+  }
+}
+
+window.deletePatient = async function(id) {
+  if (!confirm('Delete this patient record?')) return;
+  try {
+    const { error } = await supabase.from('patients').delete().eq('id', id);
+    if (error) throw error;
+    refreshAll();
+    toast('Patient deleted');
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+};
+
+window.payDue = async function(id) {
+  try {
+    const { data: p } = await supabase.from('patients').select('*').eq('id', id).single();
+    const due = p.amount - (p.paid || 0);
+    openModal('Collect Payment', `
+      <p style="margin-bottom:15px;"><strong>Patient:</strong> ${p.name}</p>
+      <p style="margin-bottom:15px;"><strong>Total:</strong> ৳${p.amount} | <strong>Due:</strong> ৳${due}</p>
+      <div class="form-group">
+        <label class="form-label">Amount to Pay</label>
+        <input type="number" class="form-input-plain" id="payAmount" value="${due}" step="0.01">
+      </div>
+    `, `
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="confirmPay(${id})"><i class="fas fa-check"></i> Confirm Payment</button>
+    `);
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+};
+
+window.confirmPay = async function(id) {
+  try {
+    const { data: p } = await supabase.from('patients').select('*').eq('id', id).single();
+    const amt = parseFloat(document.getElementById('payAmount').value);
+    const newPaid = (p.paid || 0) + amt;
+    const newStatus = newPaid >= p.amount ? 'PAID' : 'DUE';
+    
+    const { error } = await supabase
+      .from('patients')
+      .update({ 
+        paid: Math.min(newPaid, p.amount),
+        status: newStatus
+      })
+      .eq('id', id);
+    
+    if (error) throw error;
+    closeModal();
+    refreshAll();
+    toast('Payment collected');
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+};
+
+// ============ DUE MANAGEMENT ============
+async function renderDue() {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('*')
+      .eq('status', 'DUE')
+      .order('id', { ascending: false });
+    
+    if (error) throw error;
+    
+    const list = data || [];
+    const search = document.getElementById('dueSearch').value.toLowerCase();
+    const filtered = list.filter(p => p.name.toLowerCase().includes(search) || (p.referrer_name||'').toLowerCase().includes(search));
+    const total = filtered.reduce((s,p) => s + (p.amount - (p.paid||0)), 0);
+    
+    document.getElementById('dueOutstanding').textContent = total.toFixed(0);
+    document.getElementById('duePatients').textContent = filtered.length;
+    
+    const tbody = document.getElementById('dueTable');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-check-circle" style="color:var(--success)"></i><h4>No outstanding dues!</h4><p>All patients are paid</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = filtered.map(p => {
+        const due = p.amount - (p.paid||0);
+        return `
+          <tr>
+            <td>#${String(p.id).slice(-4)}</td>
+            <td><strong>${p.name}</strong></td>
+            <td>${p.referrer_name || '-'}</td>
+            <td>৳${p.amount}</td>
+            <td>৳${p.paid||0}</td>
+            <td style="color:var(--danger); font-weight:600;">৳${due}</td>
+            <td>
+              <button class="action-btn pay" onclick="payDue(${p.id})"><i class="fas fa-money-bill"></i> Collect</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  } catch (error) {
+    toast('Error loading due list: ' + error.message, 'error');
+  }
+}
+
+// ============ FILM STOCK ============
+document.getElementById('filmForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    const { data, error } = await supabase
+      .from('film_stock')
+      .insert([{
+        size: document.getElementById('fSize').value,
+        quantity: parseInt(document.getElementById('fQty').value),
+        note: document.getElementById('fNote').value.trim()
+      }])
+      .select();
+    
+    if (error) throw error;
+    e.target.reset();
+    toast('Stock added');
+    refreshAll();
+  } catch (error) {
+    toast('Error: ' + error.message, 'error');
+  }
+});
+
+async function renderFilmStock() {
+  try {
+    const { data, error } = await supabase
+      .from('film_stock')
+      .select('*')
+      .order('id', { ascending: false });
+    
+    if (error) throw error;
+    
+    const list = data || [];
+    const sizes = ['8×10', '10×14', '14×17'];
+    const totals = {};
+    sizes.forEach(s => totals[s] = list.filter(f => f.size === s).reduce((sum,f) => sum + f.quantity, 0));
+    
+    document.getElementById('filmStockCards').innerHTML = sizes.map((s,i) => {
+      const colors = ['blue','green','purple'];
+      return `
+        <div class="stat-card ${colors[i]}">
+          <div class="stat-icon"><i class="fas fa-film"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">Film ${s}</div>
+            <div class="stat-value">${totals[s]}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    const tbody = document.getElementById('filmTable');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="fas fa-film"></i><h4>No stock entries</h4></div></td></tr>';
+    } else {
+      tbody.innerHTML = list.map(f => `
+        <tr>
+          <td>${new Date(f.created_at).toLocaleDateString()}</td>
+          <td><strong>${f.size}</strong></td>
+          <td>${f.quantity}</td>
+          <td>${f.note || '-'}</td>
+        </tr>
+      `).join('');
+    }
+  } catch (error) {
+    toast('Error loading film stock: ' + error.message, 'error');
+  }
+}
+
+// ============ DASHBOARD ============
+async function renderDashboard() {
+  try {
+    const { data: list, error } = await supabase.from('patients').select('*');
+    if (error) throw error;
+    
+    const patients = list || [];
+    const total = patients.length;
+    const paid = patients.filter(p => p.status === 'PAID').length;
+    const due = patients.filter(p => p.status === 'DUE').length;
+    const collection = patients.filter(p => p.status === 'PAID').reduce((s,p) => s + p.amount, 0);
+    const outstanding = patients.filter(p => p.status === 'DUE').reduce((s,p) => s + (p.amount - (p.paid||0)), 0);
+    
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statPaid').textContent = paid;
+    document.getElementById('statDue').textContent = due;
+    document.getElementById('statCollection').textContent = collection.toFixed(0);
+    document.getElementById('statOutstanding').textContent = outstanding.toFixed(0);
+
+    const recent = patients.slice().sort((a,b) => b.id - a.id).slice(0, 5);
+    const tbody = document.getElementById('recentPatients');
+    if (!recent.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-inbox"></i><h4>No patients yet</h4><p>Add your first patient entry</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = recent.map(p => `
+        <tr>
+          <td>#${String(p.id).slice(-4)}</td>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.investigation_name}</td>
+          <td>৳${p.amount}</td>
+          <td><span class="badge badge-${p.status.toLowerCase()}">${p.status}</span></td>
+          <td>${new Date(p.created_at).toLocaleDateString()}</td>
+        </tr>
+      `).join('');
+    }
+  } catch (error) {
+    toast('Error loading dashboard: ' + error.message, 'error');
+  }
+}
+
+// ============ REPORTS ============
+window.generateReport = async function() {
+  try {
+    const from = document.getElementById('rptFrom').value;
+    const to = document.getElementById('rptTo').value;
+    const type = document.getElementById('rptType').value;
+    const refId = document.getElementById('rptReferrer').value;
+    
+    let query = supabase.from('patients').select('*');
+    
+    if (from) query = query.gte('created_at', from);
+    if (to) query = query.lte('created_at', to + 'T23:59:59');
+    if (refId) query = query.eq('referrer_id', refId);
+    if (type === 'due') query = query.eq('status', 'DUE');
+    if (type === 'paid') query = query.eq('status', 'PAID');
+    
+    const { data: list, error } = await query.order('id', { ascending: false });
+    if (error) throw error;
+    
+    const patients = list || [];
+    const total = patients.length;
+    const totalAmt = patients.reduce((s,p) => s + p.amount, 0);
+    const paidAmt = patients.filter(p => p.status === 'PAID').reduce((s,p) => s + p.amount, 0);
+    const dueAmt = patients.filter(p => p.status === 'DUE').reduce((s,p) => s + (p.amount - (p.paid||0)), 0);
+
+    let html = `
+      <div style="background:#f8fafc; padding:20px; border-radius:12px; margin-bottom:20px;">
+        <h4 style="margin-bottom:10px;">Report Summary</h4>
+        <p><strong>Type:</strong> ${type.charAt(0).toUpperCase()+type.slice(1)}</p>
+        <p><strong>Period:</strong> ${from || 'Start'} to ${to || 'Now'}</p>
+        <p><strong>Total Patients:</strong> ${total}</p>
+        <p><strong>Total Amount:</strong> ৳${totalAmt}</p>
+        <p><strong>Paid Amount:</strong> ৳${paidAmt}</p>
+        <p><strong>Outstanding Due:</strong> ৳${dueAmt}</p>
+      </div>
+    `;
+    if (patients.length) {
+      html += `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Patient</th><th>Investigation</th><th>Referrer</th><th>Amount</th><th>Status</th></tr></thead><tbody>`;
+      html += patients.map(p => `
+        <tr>
+          <td>${new Date(p.created_at).toLocaleDateString()}</td>
+          <td>${p.name}</td>
+          <td>${p.investigation_name}</td>
+          <td>${p.referrer_name || '-'}</td>
+          <td>৳${p.amount}</td>
+          <td><span class="badge badge-${p.status.toLowerCase()}">${p.status}</span></td>
+        </tr>
+      `).join('');
+      html += '</tbody></table></div>';
+    } else {
+      html += '<div class="empty-state"><i class="fas fa-inbox"></i><h4>No data for selected criteria</h4></div>';
+    }
+    document.getElementById('reportContent').innerHTML = html;
+    document.getElementById('reportResult').style.display = 'block';
+    toast('Report generated');
+  } catch (error) {
+    toast('Error generating report: ' + error.message, 'error');
+  }
+};
+
+window.printReport = function() {
+  const content = document.getElementById('reportContent').innerHTML;
+  if (!content) { toast('Generate a report first', 'error'); return; }
+  const w = window.open('', '_blank');
+  w.document.write(`
+    <html><head><title>Report - Satata X-Ray</title>
+    <style>
+      body { font-family: Arial; padding: 30px; }
+      h1 { color: #0891b2; border-bottom: 2px solid #0891b2; padding-bottom: 10px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+      th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
+      th { background: #0891b2; color: white; }
+      .badge { padding: 3px 8px; border-radius: 10px; font-size: 11px; }
+      .badge-paid { background: #d1fae5; color: #065f46; }
+      .badge-due { background: #fee2e2; color: #991b1b; }
+    </style></head><body>
+    <h1>Satata X-Ray & Diagnostic Center</h1>
+    <p>Chuadanga | Report Generated: ${new Date().toLocaleString()}</p>
+    ${content}
+    </body></html>
+  `);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
+};
+
+window.shareWhatsApp = function() {
+  const content = document.getElementById('reportContent').innerText;
+  if (!content) { toast('Generate a report first', 'error'); return; }
+  const msg = `*Satata X-Ray & Diagnostic Center*\nChuadanga\n\n${content}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+};
+
+// ============ SEARCH LISTENERS ============
+document.getElementById('patientSearch').addEventListener('input', renderPatients);
+document.getElementById('patientFilter').addEventListener('change', renderPatients);
+document.getElementById('dueSearch').addEventListener('input', renderDue);
+
+// ============ REFRESH ALL ============
+function refreshAll() {
+  renderDashboard();
+  renderInvestigations();
+  renderReferrers();
+  renderPatients();
+  renderDue();
+  renderFilmStock();
+}
+</script>
+</body>
+</html>
